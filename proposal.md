@@ -135,3 +135,37 @@ At minimum, a browser client should be able to:
 * Consume results incrementally
 
 WebSocket transport is proposed as a way to simplify this path while preserving Flight semantics.
+
+---
+
+## Performance Observations (Preliminary)
+
+**Configuration**
+
+* 4 concurrent clients
+* 3 iterations per client (12 total operations)
+* Query: 2M rows, 4 columns (8M values/query)
+* Total processed: 24M rows (~732 MB logical data)
+
+**Results**
+
+| Metric                   | WebSocket  | FlightSQL (gRPC) |
+| ------------------------ | ---------- | ---------------- |
+| Rows/sec                 | ~87.6M     | ~63.4M           |
+| Throughput               | ~2.68 GB/s | ~1.93 GB/s       |
+| Latency (p50)            | 70 ms      | 109 ms           |
+| First-byte latency (p50) | 1 ms       | 4 ms             |
+| Batches/query            | 977        | 977              |
+
+**Observations**
+
+* In this configuration, the WebSocket transport demonstrated higher observed throughput (~30–40%) and lower median latency.
+* Both transports processed identical queries, row counts, and batch counts, suggesting comparable execution work at the logical level.
+* These results indicate that a WebSocket transport can be competitive with, and in some cases exceed, gRPC-based Flight performance under certain conditions.
+
+**Caveats**
+
+* Results reflect a single implementation and workload and should not be generalized without further validation.
+* Client-side processing differs between transports; decode and read-time metrics are not directly comparable.
+* Measurements are sensitive to batching behavior, buffering, and driver/runtime implementation details.
+* Additional benchmarking across varied workloads, data shapes, and deployment environments is required to draw broader conclusions.
