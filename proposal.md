@@ -142,6 +142,8 @@ WebSocket transport is proposed as a way to simplify this path while preserving 
 
 **Configuration**
 
+Apple M4 32GB
+
 * 4 concurrent clients
 * 3 iterations per client (12 total operations)
 * Query: 2M rows, 4 columns (8M values/query)
@@ -149,19 +151,21 @@ WebSocket transport is proposed as a way to simplify this path while preserving 
 
 **Results**
 
-| Metric                   | WebSocket  | FlightSQL (gRPC) |
-| ------------------------ | ---------- | ---------------- |
-| Rows/sec                 | ~87.6M     | ~63.4M           |
-| Throughput               | ~2.68 GB/s | ~1.93 GB/s       |
-| Latency (p50)            | 70 ms      | 109 ms           |
-| First-byte latency (p50) | 1 ms       | 4 ms             |
-| Batches/query            | 977        | 977              |
+| Metric        | WebSocket    | FlightSQL (gRPC) |
+| ------------- | ------------ | ---------------- |
+| Rows/sec      | 130.7M       | 121.7M           |
+| Throughput    | 1014.32 MB/s | 928.53 MB/s      |
+| Latency (p50) | 26 ms        | 17 ms            |
+| Latency (p95) | 41 ms        | 60 ms            |
+| Latency (p99) | 41 ms        | 60 ms            |
 
 **Observations**
 
-* In this configuration, the WebSocket transport demonstrated higher observed throughput (~30–40%) and lower median latency.
-* Both transports processed identical queries, row counts, and batch counts, suggesting comparable execution work at the logical level.
-* These results indicate that a WebSocket transport can be competitive with, and in some cases exceed, gRPC-based Flight performance under certain conditions.
+* WebSocket shows higher sustained throughput (~9% higher in this run).
+* FlightSQL has better median latency, but worse tail latency (p95/p99 divergence).
+* WebSocket tail latency is tighter, suggesting more stable streaming behavior under load.
+* Both transports are in the same performance class; differences are workload and scheduling-sensitive rather than structural.
+
 
 **Caveats**
 
