@@ -1,1 +1,1 @@
-# flight-websocket-proposal
+See [proposal.md](proposal.md)
